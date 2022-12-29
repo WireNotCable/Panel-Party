@@ -1,13 +1,26 @@
 import pygame
-
 # Initialize pygame
 pygame.init()
 
 # Create screen
-screen = pygame.display.set_mode((800, 600))
+screen = pygame.display.set_mode((600, 700))
 
 # Caption
 pygame.display.set_caption("Panel Party")
+
+# Field
+field = [
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 2, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+]
 
 # Player 1
 player1Image = pygame.image.load('ghost.png')
@@ -37,7 +50,32 @@ speed = 0.1
 # Game Loop
 running = True
 while running:
+    blockSize = 50
+    space = 10
     screen.fill((0, 0, 0))
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+
+    # Draw field
+    row_num = 0
+    if row_num == 9:
+        row_num = 0
+    for row in range(5, 600, space+blockSize):
+        col_num = 0
+        if col_num == 9:
+            col_num = 0
+        for col in range(5, 600, space+blockSize):
+            rect = pygame.Rect(row, col, blockSize, blockSize)
+            if field[row_num][col_num] == 0:
+                pygame.draw.rect(screen, (128, 128, 128), rect)
+            elif field[row_num][col_num] == 1:
+                pygame.draw.rect(screen, (255, 0, 0), rect)
+            elif field[row_num][col_num] == 2:
+                pygame.draw.rect(screen, (0, 0, 255), rect)
+            col_num += 1
+        row_num += 1
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -89,12 +127,12 @@ while running:
     # Player 2 does not exit border
     if p2x <= 0:
         p2x = 0
-    if p2x >= 736:
-        p2x = 736
+    if p2x >= 636:
+        p2x = 636
     if p2y <= 0:
         p2y = 0
-    if p2y >= 536:
-        p2y = 536
+    if p2y >= 636:
+        p2y = 636
     player2(p2x, p2y)
 
     pygame.display.update()
