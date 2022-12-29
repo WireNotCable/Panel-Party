@@ -45,7 +45,7 @@ def player2(x2, y2):
 
 
 # Speed
-speed = 0.1
+speed = 0.5
 
 # Game Loop
 running = True
@@ -53,28 +53,6 @@ while running:
     blockSize = 50
     space = 10
     screen.fill((0, 0, 0))
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-
-    # Draw field
-    row_num = 0
-    if row_num == 9:
-        row_num = 0
-    for row in range(5, 600, space+blockSize):
-        col_num = 0
-        if col_num == 9:
-            col_num = 0
-        for col in range(5, 600, space+blockSize):
-            rect = pygame.Rect(row, col, blockSize, blockSize)
-            if field[row_num][col_num] == 0:
-                pygame.draw.rect(screen, (128, 128, 128), rect)
-            elif field[row_num][col_num] == 1:
-                pygame.draw.rect(screen, (255, 0, 0), rect)
-            elif field[row_num][col_num] == 2:
-                pygame.draw.rect(screen, (0, 0, 255), rect)
-            col_num += 1
-        row_num += 1
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -113,26 +91,46 @@ while running:
     p2x += p2xChange
     p2y += p2yChange
 
+    # Draw field
+    row_num = 0
+    if row_num == 9:
+        row_num = 0
+    for row in range(5, 600, space+blockSize):
+        col_num = 0
+        if col_num == 9:
+            col_num = 0
+        for col in range(5, 600, space+blockSize):
+            rect = pygame.Rect(row, col, blockSize, blockSize)
+            if field[row_num][col_num] == 0:
+                pygame.draw.rect(screen, (128, 128, 128), rect)
+            elif field[row_num][col_num] == 1:
+                pygame.draw.rect(screen, (255, 0, 0), rect)
+            elif field[row_num][col_num] == 2:
+                pygame.draw.rect(screen, (0, 0, 255), rect)
+            col_num += 1
+        row_num += 1
+
+    border = 536
     # Player 1 does not exit border
     if p1x <= 0:
         p1x = 0
-    if p1x >= 736:
-        p1x = 736
+    if p1x >= border:
+        p1x = border
     if p1y <= 0:
         p1y = 0
-    if p1y >= 536:
-        p1y = 536
+    if p1y >= border:
+        p1y = border
     player1(p1x, p1y)
 
     # Player 2 does not exit border
     if p2x <= 0:
         p2x = 0
-    if p2x >= 636:
-        p2x = 636
+    if p2x >= border:
+        p2x = border
     if p2y <= 0:
         p2y = 0
-    if p2y >= 636:
-        p2y = 636
+    if p2y >= border:
+        p2y = border
     player2(p2x, p2y)
 
     pygame.display.update()
