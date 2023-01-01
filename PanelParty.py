@@ -123,24 +123,27 @@ while True:
         player2.moveUp(dist)
 
     # Collision detection
-    p1_hit_list = pygame.sprite.spritecollide(player1, tile_group, True)
-    p2_hit_list = pygame.sprite.spritecollide(player2, tile_group, True)
+    p1_hit_list = pygame.sprite.spritecollide(player1, tile_group, False)
+    p2_hit_list = pygame.sprite.spritecollide(player2, tile_group, False)
     # for i in tile_group:
-    #     if pygame.sprite.spritecollide(player1, tile, False):
-    #         tile.changeColor((255, 0, 0))
-    #         p1_points += 1
+    print("P1: {}".format(p1_hit_list))
+    print("P2: {}".format(p2_hit_list))
+    for i in p1_hit_list:
+        i.changeColor((255, 0, 0))
+    for i in p2_hit_list:
+        i.changeColor((0, 0, 255))
 
     # Calculate score
-    for i in p1_hit_list:
-        p1_points += 1
-    for i in p2_hit_list:
-        p2_points += 1
+    # for i in p1_hit_list:
+    #     p1_points += 1
+    # for i in p2_hit_list:
+    #     p2_points += 1
 
     # Display score
-    text_surface = my_font.render("Ghost: "+str(p1_points), False, (0, 255, 0))
-    screen.blit(text_surface, (100, 600))
-    text_surface = my_font.render("Mario: "+str(p2_points), False, (0, 255, 0))
-    screen.blit(text_surface, (400, 600))
+    # text_surface = my_font.render("Ghost: "+str(p1_points), False, (0, 255, 0))
+    # screen.blit(text_surface, (100, 600))
+    # text_surface = my_font.render("Mario: "+str(p2_points), False, (0, 255, 0))
+    # screen.blit(text_surface, (400, 600))
 
     all_group.draw(screen)
     all_group.update()
