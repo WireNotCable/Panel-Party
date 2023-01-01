@@ -1,136 +1,147 @@
 import pygame
-# Initialize pygame
+
+
+class Tile(pygame.sprite.Sprite):
+    def __init__(self, width, height, pos_x, pos_y, color):
+        super().__init__()
+        self.image = pygame.Surface([width, height])
+        self.image.fill(color)
+        self.rect = self.image.get_rect()
+        self.rect.center = [pos_x, pos_y]
+
+    def changeColor(self, color):
+        self.image.fill(color)
+
+
+class Player1(pygame.sprite.Sprite):
+    def __init__(self, path, height, width):
+        super().__init__()
+        self.image = pygame.image.load(path)
+        self.image = pygame.transform.scale(self.image, (height, width))
+        self.rect = self.image.get_rect()
+
+        if self.rect.x <= 25:
+            self.rect.x = 25
+
+    def border(self):
+        if self.rect.x <= 0:
+            self.rect.x = 0
+        if self.rect.x >= 550:
+            self.rect.x = 550
+        if self.rect.y <= 0:
+            self.rect.y = 0
+        if self.rect.y >= 550:
+            self.rect.y = 550
+
+    def moveRight(self, dist):
+        self.rect.x += dist
+
+    def moveLeft(self, dist):
+        self.rect.x -= dist
+
+    def moveDown(self, dist):
+        self.rect.y += dist
+
+    def moveUp(self, dist):
+        self.rect.y -= dist
+
+
+# General setup
 pygame.init()
 
-# Create screen
-screen = pygame.display.set_mode((600, 700))
+# Main window
+screen_width = 600
+screen_height = 700
+screen = pygame.display.set_mode((screen_width, screen_height))
+pygame.display.set_caption('Panel Party')
 
-# Caption
-pygame.display.set_caption("Panel Party")
+# Variables
+dist = 1
+p1_points = 0
+p2_points = 0
 
-# Field
-field = [
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 2, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-]
+# Game Objects
+all_group = pygame.sprite.Group()
+tile_group = pygame.sprite.Group()
+for row in range(40, screen_width, 65):
+    for col in range(40, screen_width, 65):
+        tile = Tile(50, 50, row, col, (128, 128, 128))
+        tile_group.add(tile)
+        tile_group.draw(screen)
+        all_group.add(tile)
 
-# Player 1
-player1Image = pygame.image.load('ghost.png')
-player1Image = pygame.transform.scale(player1Image, (64, 64))
-p1x, p1y = 0, 0
-p1xChange, p1yChange = 0, 0
+player_group = pygame.sprite.Group()
+player1 = Player1('ghost.png', 50, 50)
+player1.rect.x = 25
+player1.rect.y = 25
+player_group.add(player1)
+all_group.add(player1)
 
+player2 = Player1('super-mario.png', 50, 50)
+player2.rect.x = screen_width - 25
+player2.rect.y = screen_height - 25
+player_group.add(player2)
+all_group.add(player2)
 
-def player1(x1, y1):
-    screen.blit(player1Image, (x1, y1))  # blit means draw
-
-
-# Player 2
-player2Image = pygame.image.load('super-mario.png')
-player2Image = pygame.transform.scale(player2Image, (64, 64))
-p2x, p2y = 370, 50
-p2xChange, p2yChange = 0, 0
-
-
-def player2(x2, y2):
-    screen.blit(player2Image, (x2, y2))
-
-
-# Speed
-speed = 0.5
 
 # Game Loop
-running = True
-while running:
-    blockSize = 50
-    space = 10
-    screen.fill((0, 0, 0))
+while True:
+    my_font = pygame.font.SysFont('Comic Sans MS', 30)
+    # No more tiles
+    if p1_points+p2_points == 81:
+        pygame.time.wait(4000)
+        pygame.quit()
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            running = False
+            pygame.quit()
 
-        # keys to control movements
-        if event.type == pygame.KEYDOWN:
-            # Player 1 movements
-            if event.key == pygame.K_LEFT:
-                p1xChange = -speed
-            if event.key == pygame.K_RIGHT:
-                p1xChange = speed
-            if event.key == pygame.K_DOWN:
-                p1yChange = speed
-            if event.key == pygame.K_UP:
-                p1yChange = -speed
-            # Player 2 movements
-            if event.key == pygame.K_a:
-                p2xChange = -speed
-            if event.key == pygame.K_d:
-                p2xChange = speed
-            if event.key == pygame.K_s:
-                p2yChange = speed
-            if event.key == pygame.K_w:
-                p2yChange = -speed
-        if event.type == pygame.KEYUP:
-            if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT or event.key == pygame.K_UP or event.key == pygame.K_DOWN:
-                p1xChange = 0
-                p1yChange = 0
-            if event.key == pygame.K_a or event.key == pygame.K_d or event.key == pygame.K_s or event.key == pygame.K_w:
-                p2xChange = 0
-                p2yChange = 0
+    screen.fill((0, 0, 0))
+    pygame.draw.rect(screen, (0, 255, 0), pygame.Rect(0, 0, 600, 600),  2)
 
-    p1x += p1xChange
-    p1y += p1yChange
-    p2x += p2xChange
-    p2y += p2yChange
+    # keys to control movements
+    keys = pygame.key.get_pressed()
+    # Player 1 movements
+    player1.border()
+    if keys[pygame.K_LEFT]:
+        player1.moveLeft(dist)
+    if keys[pygame.K_RIGHT]:
+        player1.moveRight(dist)
+    if keys[pygame.K_DOWN]:
+        player1.moveDown(dist)
+    if keys[pygame.K_UP]:
+        player1.moveUp(dist)
+    # Player 2 movements
+    player2.border()
+    if keys[pygame.K_a]:
+        player2.moveLeft(dist)
+    if keys[pygame.K_d]:
+        player2.moveRight(dist)
+    if keys[pygame.K_s]:
+        player2.moveDown(dist)
+    if keys[pygame.K_w]:
+        player2.moveUp(dist)
 
-    # Draw field
-    row_num = 0
-    if row_num == 9:
-        row_num = 0
-    for row in range(5, 600, space+blockSize):
-        col_num = 0
-        if col_num == 9:
-            col_num = 0
-        for col in range(5, 600, space+blockSize):
-            rect = pygame.Rect(row, col, blockSize, blockSize)
-            if field[row_num][col_num] == 0:
-                pygame.draw.rect(screen, (128, 128, 128), rect)
-            elif field[row_num][col_num] == 1:
-                pygame.draw.rect(screen, (255, 0, 0), rect)
-            elif field[row_num][col_num] == 2:
-                pygame.draw.rect(screen, (0, 0, 255), rect)
-            col_num += 1
-        row_num += 1
+    # Collision detection
+    p1_hit_list = pygame.sprite.spritecollide(player1, tile_group, True)
+    p2_hit_list = pygame.sprite.spritecollide(player2, tile_group, True)
+    # for i in tile_group:
+    #     if pygame.sprite.spritecollide(player1, tile, False):
+    #         tile.changeColor((255, 0, 0))
+    #         p1_points += 1
 
-    border = 536
-    # Player 1 does not exit border
-    if p1x <= 0:
-        p1x = 0
-    if p1x >= border:
-        p1x = border
-    if p1y <= 0:
-        p1y = 0
-    if p1y >= border:
-        p1y = border
-    player1(p1x, p1y)
+    # Calculate score
+    for i in p1_hit_list:
+        p1_points += 1
+    for i in p2_hit_list:
+        p2_points += 1
 
-    # Player 2 does not exit border
-    if p2x <= 0:
-        p2x = 0
-    if p2x >= border:
-        p2x = border
-    if p2y <= 0:
-        p2y = 0
-    if p2y >= border:
-        p2y = border
-    player2(p2x, p2y)
+    # Display score
+    text_surface = my_font.render("Ghost: "+str(p1_points), False, (0, 255, 0))
+    screen.blit(text_surface, (100, 600))
+    text_surface = my_font.render("Mario: "+str(p2_points), False, (0, 255, 0))
+    screen.blit(text_surface, (400, 600))
 
+    all_group.draw(screen)
+    all_group.update()
     pygame.display.update()
