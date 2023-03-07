@@ -61,18 +61,19 @@ pygame.display.set_caption('Panel Party')
 dist = 1
 p1_points = 0
 p2_points = 0
-timer = 10
+timer = 40
+tile_size = 30
 my_font = pygame.font.SysFont('Comic Sans MS', 30)
 text = my_font.render(str(timer), True, (0, 0, 0))
-timer_event = pygame.USEREVENT+1
+timer_event = pygame.USEREVENT + 1
 pygame.time.set_timer(timer_event, 1000)
 
 # Game Objects
 all_group = pygame.sprite.Group()
 tile_group = pygame.sprite.Group()
-for row in range(40, screen_width, 65):
-    for col in range(40, screen_width, 65):
-        tile = Tile(50, 50, row, col, (128, 128, 128))
+for row in range(40, screen_width, 35):
+    for col in range(40, screen_width, 35):
+        tile = Tile(tile_size, tile_size, row, col, (128, 128, 128))
         tile_group.add(tile)
         tile_group.draw(screen)
         all_group.add(tile)
@@ -80,14 +81,14 @@ for row in range(40, screen_width, 65):
 player_group = pygame.sprite.Group()
 
 # Create player1
-player1 = Player('ghost.png', 50, 50)
-player1.rect.x = 25
-player1.rect.y = 25
+player1 = Player("game\\super-mario.png", 50, 50)
+player1.rect.x = 0
+player1.rect.y = 0
 player_group.add(player1)
 all_group.add(player1)
 
 # Create player2
-player2 = Player('super-mario.png', 50, 50)
+player2 = Player("game\\ghost.png", 50, 50)
 player2.rect.x = screen_width - 25
 player2.rect.y = screen_height - 25
 player_group.add(player2)
@@ -95,7 +96,7 @@ all_group.add(player2)
 
 
 # Game Loop
-while True and timer != 0:
+while timer >= 0:
     p1_points = 0
     p2_points = 0
     my_font = pygame.font.SysFont('Comic Sans MS', 30)
@@ -103,39 +104,40 @@ while True and timer != 0:
     # end game criteria
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
+            exit()
             pygame.quit()
         elif event.type == timer_event:
             timer -= 1
             text = my_font.render(
-                "Time left: "+str(timer)+" sec", True, (0, 0, 0))
+                "Time left: " + str(timer) + " sec", True, (0, 0, 0))
             if timer == 0:
+                # this part is causing the freeze
                 pygame.time.wait(4000)
                 pygame.time.set_timer(timer_event, 0)
     screen.fill((0, 0, 0))
-    pygame.draw.rect(screen, (0, 255, 0), pygame.Rect(0, 0, 600, 600),  2)
+    pygame.draw.rect(screen, (0, 255, 0), pygame.Rect(0, 0, 600, 600), 2)
     screen.blit(text, (250, 650))
 
-    # keys to control movements
     keys = pygame.key.get_pressed()
     # Player 1 movements
     player1.border()
-    if keys[pygame.K_LEFT]:
+    if keys[pygame.K_a]:
         player1.moveLeft(dist)
-    if keys[pygame.K_RIGHT]:
+    if keys[pygame.K_d]:
         player1.moveRight(dist)
-    if keys[pygame.K_DOWN]:
+    if keys[pygame.K_s]:
         player1.moveDown(dist)
-    if keys[pygame.K_UP]:
+    if keys[pygame.K_w]:
         player1.moveUp(dist)
     # Player 2 movements
     player2.border()
-    if keys[pygame.K_a]:
+    if keys[pygame.K_LEFT]:
         player2.moveLeft(dist)
-    if keys[pygame.K_d]:
+    if keys[pygame.K_RIGHT]:
         player2.moveRight(dist)
-    if keys[pygame.K_s]:
+    if keys[pygame.K_DOWN]:
         player2.moveDown(dist)
-    if keys[pygame.K_w]:
+    if keys[pygame.K_UP]:
         player2.moveUp(dist)
 
     # Collision detection
@@ -155,10 +157,14 @@ while True and timer != 0:
             p2_points += 1
 
     # Display score
-    text_surface = my_font.render("Ghost: "+str(p1_points), False, (0, 255, 0))
+    text_surface = my_font.render(
+        "Mario: " + str(p1_points), False, (0, 255, 0))
     screen.blit(text_surface, (100, 600))
-    text_surface = my_font.render("Mario: "+str(p2_points), False, (0, 255, 0))
+    text_surface = my_font.render(
+        "Ghost: " + str(p2_points), False, (0, 255, 0))
     screen.blit(text_surface, (400, 600))
     all_group.draw(screen)
     all_group.update()
     pygame.display.update()
+
+pygame.quit()
